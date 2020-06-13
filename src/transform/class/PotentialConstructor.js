@@ -25,6 +25,7 @@ class PotentialConstructor extends PotentialMethod {
 
   // Transforms constructor body by replacing
   // SuperClass.call(this, ...args) --> super(...args)
+  // var t = SuperClass.call(this, ...args) || this --> super(...args)
   transformSuperCalls(body) {
     return traverser.replace(body, {
       enter: (node) => {
@@ -41,6 +42,40 @@ class PotentialConstructor extends PotentialMethod {
   isSuperConstructorCall(node) {
     return matches({
       type: 'ExpressionStatement',
+      expression: {
+        type: 'CallExpression',
+        callee: {
+          type: 'MemberExpression',
+          object: obj => isEqualAst(obj, this.superClass),
+          property: {
+            type: 'Identifier',
+            name: 'call'
+          }
+        },
+        arguments: [
+          {
+            type: 'ThisExpression'
+          }
+        ]
+      }
+    }, node);
+  }
+
+  isSuperOrThisCall(node) {
+    return matches({
+      type: 'VariableDeclarator'
+    }, node);
+  }
+
+  isSuperConstructorCallAssignment(node) {
+    return matches({
+      type: 'VariableDeclaration',
+      declarations: [
+        {
+          type: 'VariableDeclarator',
+
+        }
+      ],
       expression: {
         type: 'CallExpression',
         callee: {

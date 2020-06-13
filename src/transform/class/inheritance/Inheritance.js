@@ -1,5 +1,6 @@
 import UtilInherits from './UtilInherits';
 import Prototypal from './Prototypal';
+import GlobalExtends from './GlobalExtends';
 
 /**
  * Processes nodes to detect super classes and return information for later
@@ -13,6 +14,7 @@ export default class Inheritance {
   constructor() {
     this.utilInherits = new UtilInherits();
     this.prototypal = new Prototypal();
+    this.globalExtends = new GlobalExtends();
   }
 
   /**
@@ -27,7 +29,8 @@ export default class Inheritance {
   process(node, parent) {
     return (
       this.utilInherits.process(node, parent) ||
-      this.prototypal.process(node, parent)
+      this.prototypal.process(node, parent) ||
+      this.globalExtends.process(node, parent)
     );
   }
 }

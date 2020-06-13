@@ -1,10 +1,14 @@
 import {includes, isString} from 'lodash/fp';
 import estraverse from 'estraverse';
 
-// JSX AST types, as documented in:
+// Additional AST types.
+// ClassProperty,
+// JSX, as documented in:
 // https://github.com/facebook/jsx/blob/master/AST.md
 const jsxExtensionKeys = {
   keys: {
+    ClassProperty: ['key', 'value'],
+    FieldDefinition: ['key', 'value'],
     JSXIdentifier: [],
     JSXMemberExpression: ['object', 'property'],
     JSXNamespacedName: ['namespace', 'name'],

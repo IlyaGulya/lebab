@@ -1,10 +1,13 @@
 import espree from 'espree';
+import acornStaticClassFeatures from 'acorn-static-class-features';
+import classFieldsPlugin from './utils/acorn/classFieldsPlugin';
 
 const ESPREE_OPTS = {
   ecmaVersion: 9,
   ecmaFeatures: {jsx: true},
   comment: true,
-  tokens: true
+  tokens: true,
+  additionalAcornExtensions: [acornStaticClassFeatures, classFieldsPlugin]
 };
 
 /**

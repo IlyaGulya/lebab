@@ -1,4 +1,5 @@
 import {matches, extract, extractAny} from 'f-matches';
+import isTransformableToMethod from './isTransformableToMethod';
 
 /**
  * Matches: <className>.<methodName> = function () { ... }
@@ -29,8 +30,6 @@ export default matches({
       }
     },
     operator: '=',
-    right: extract('methodNode', {
-      type: 'FunctionExpression'
-    })
+    right: extract('methodNode', isTransformableToMethod)
   }
 });

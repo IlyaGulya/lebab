@@ -1,4 +1,6 @@
 import createTestHelpers from '../createTestHelpers';
+import stripIndent from 'strip-indent';
+
 const {expectTransform, expectNoChange} = createTestHelpers(['class']);
 
 describe('Classes', () => {
@@ -28,6 +30,18 @@ describe('Classes', () => {
       'class MyClass {\n' +
       '  static method(a, b) {\n' +
       '  }\n' +
+      '}'
+    );
+  });
+
+  it('should convert static field declarations with assignment to static class fields', () => {
+    expectTransform(
+      'function MyClass() {\n' +
+      '}\n' +
+      'MyClass.field = "test"'
+    ).toReturn(
+      'class MyClass {\n' +
+      '  static field = "test";\n' +
       '}'
     );
   });
@@ -65,6 +79,63 @@ describe('Classes', () => {
         '  }\n' +
         '}'
       );
+    });
+
+    it('should convert to class (when anonymous construction function used)', () => {
+      expectTransform(
+        stripIndent(`
+          const Test = function() {
+              function a() {
+
+              }
+
+              a.prototype.test = function () {
+
+              };
+              return a
+          }();
+        `)).toReturn(stripIndent(`
+          class Test {
+              test() {
+
+              }
+          }
+        `));
+    });
+
+    it('should convert to class (when double nested anonymous construction with extension function used)', () => {
+      expectTransform(
+        stripIndent(`
+          var __extends;
+
+          const Test = function(_super) {
+              function a() {
+                var t = _super.call(this) || this
+                t.direction = null
+                return t
+              }
+
+              __extends(a, _super)
+
+              a.prototype.test = function () {
+
+              };
+              return a
+          }(EventDispatcher);
+        `)).toReturn(stripIndent(`
+          class Test extends EventDispatcher {
+
+            direction = null
+
+            constructor() {
+
+            }
+
+            test() {
+
+            }
+          }
+        `));
     });
 
     it('should not convert arrow-function to class', () => {
