@@ -1,5 +1,4 @@
 import {matches, extract, extractAny} from 'f-matches';
-import isFunctionProperty from './isFunctionProperty';
 
 /**
  * Matches: <className>.<fieldName> = <value>
@@ -13,6 +12,22 @@ import isFunctionProperty from './isFunctionProperty';
  * @param  {Object} node
  * @return {Object}
  */
+const matchLiteral = matches({
+  type: 'Literal'
+});
+const matchObject = matches({
+  type: 'ObjectExpression'
+});
+const matchArray = matches({
+  type: 'ArrayExpression'
+});
+const matchNew = matches({
+  type: 'NewExpression'
+});
+const matchCall = matches({
+  type: 'CallExpression'
+});
+
 export default matches({
   type: 'ExpressionStatement',
   expression: {
@@ -21,11 +36,11 @@ export default matches({
       type: 'MemberExpression',
       computed: false,
       object: extractAny('classIdentifier'),
-      property: extractAny('arrayIdentifier')
+      property: extractAny('fieldIdentifier')
     },
     operator: '=',
-    right: extract('arrayNode', {
-      type: 'ArrayExpression'
-    })
+    right: extract('fieldNode', (node => {
+      return matchLiteral(node) || matchObject(node) || matchArray(node) || matchNew(node) || matchCall(node);
+    }))
   }
 });

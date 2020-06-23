@@ -10,12 +10,10 @@ import matchPrototypeFunctionAssignment from './matchPrototypeFunctionAssignment
 import matchPrototypeObjectAssignment from './matchPrototypeObjectAssignment';
 import matchObjectDefinePropertyCall from './matchObjectDefinePropertyCall';
 import Inheritance from './inheritance/Inheritance';
-import matchFieldLiteralAssignment from './matchFieldLiteralAssignment';
+import matchFieldAssignment from './matchFieldAssignment';
 import PotentialField from './PotentialField';
 import matchAnonymousClassConstructionFunction from './matchAnonymousClassConstructionFunction';
 import matchSuperCall from './matchSuperCall';
-import matchFieldObjectAssignment from './matchFieldObjectAssignment';
-import matchFieldArrayAssignment from './matchFieldArrayAssignment';
 
 export default function(ast, logger) {
   const context = new Map();
@@ -75,7 +73,7 @@ export default function(ast, logger) {
           }));
         }
       }
-      else if ((m = matchFieldLiteralAssignment(node))) {
+      else if ((m = matchFieldAssignment(node))) {
         const directPotentialClass = potentialClasses[m.classIdentifier.name];
         const realClassName = parentContext && parentContext.parent && parentContext.parent.id && parentContext.parent.id.name;
         const realPotentialClass = realClassName && potentialClasses[realClassName];
@@ -91,38 +89,7 @@ export default function(ast, logger) {
           }));
         }
       }
-      else if ((m = matchFieldObjectAssignment(node))) {
-        const directPotentialClass = potentialClasses[m.classIdentifier.name];
-        const realClassName = parentContext && parentContext.parent && parentContext.parent.id && parentContext.parent.id.name;
-        const realPotentialClass = realClassName && potentialClasses[realClassName];
-        const potentialClass = realPotentialClass || directPotentialClass;
-        if (potentialClass) {
-          const isStatic = potentialClass === directPotentialClass;
-          potentialClass.addField(new PotentialField({
-            name: m.objectIdentifier.name,
-            valueNode: m.objectNode,
-            fullNode: node,
-            parent,
-            static: isStatic,
-          }));
-        }
-      }
-      else if ((m = matchFieldArrayAssignment(node))) {
-        const directPotentialClass = potentialClasses[m.classIdentifier.name];
-        const realClassName = parentContext && parentContext.parent && parentContext.parent.id && parentContext.parent.id.name;
-        const realPotentialClass = realClassName && potentialClasses[realClassName];
-        const potentialClass = realPotentialClass || directPotentialClass;
-        if (potentialClass) {
-          const isStatic = potentialClass === directPotentialClass;
-          potentialClass.addField(new PotentialField({
-            name: m.arrayIdentifier.name,
-            valueNode: m.arrayNode,
-            fullNode: node,
-            parent,
-            static: isStatic,
-          }));
-        }
-      }
+
       // else if ((m = matchSuperCall(node))) {
       //   let cParent = parent;
       //   let realPotentialClass;
