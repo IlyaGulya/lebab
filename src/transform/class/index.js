@@ -58,12 +58,8 @@ export default function(ast, logger) {
         );
       }
       else if ((m = matchFunctionAssignment(node))) {
-        const directPotentialClass = potentialClasses[m.className];
-        const realClassName = parentContext && parentContext.parent && parentContext.parent.id && parentContext.parent.id.name;
-        const realPotentialClass = realClassName && potentialClasses[realClassName];
-        const potentialClass = realPotentialClass || directPotentialClass;
-        if (potentialClass) {
-          potentialClass.addMethod(new PotentialMethod({
+        if (potentialClasses[m.className]) {
+          potentialClasses[m.className].addMethod(new PotentialMethod({
             name: m.methodName,
             methodNode: m.methodNode,
             fullNode: node,
@@ -73,36 +69,6 @@ export default function(ast, logger) {
           }));
         }
       }
-      else if ((m = matchFieldAssignment(node))) {
-        const directPotentialClass = potentialClasses[m.classIdentifier.name];
-        const realClassName = parentContext && parentContext.parent && parentContext.parent.id && parentContext.parent.id.name;
-        const realPotentialClass = realClassName && potentialClasses[realClassName];
-        const potentialClass = realPotentialClass || directPotentialClass;
-        if (potentialClass) {
-          const isStatic = potentialClass === directPotentialClass;
-          potentialClass.addField(new PotentialField({
-            name: m.fieldIdentifier.name,
-            valueNode: m.fieldNode,
-            fullNode: node,
-            parent,
-            static: isStatic,
-          }));
-        }
-      }
-
-      // else if ((m = matchSuperCall(node))) {
-      //   let cParent = parent;
-      //   let realPotentialClass;
-      //   do {
-      //     const realClassName = cParent && cParent.id && cParent.id.name;
-      //     realPotentialClass = realClassName && potentialClasses[realClassName];
-      //     const pContext = getContext(cParent);
-      //     cParent = pContext && pContext.parent;
-      //   } while (!realPotentialClass && cParent);
-      //   if (realPotentialClass) {
-      //     realPotentialClass.addSuperCall(parent, node, m.constructorArguments);
-      //   }
-      // }
       else if ((m = matchPrototypeFunctionAssignment(node))) {
         if (potentialClasses[m.className]) {
           potentialClasses[m.className].addMethod(new PotentialMethod({
