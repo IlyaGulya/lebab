@@ -69,6 +69,22 @@ export default function(ast, logger) {
           }));
         }
       }
+      else if ((m = matchFieldAssignment(node))) {
+        const directPotentialClass = potentialClasses[m.classIdentifier.name];
+        const realClassName = parentContext && parentContext.parent && parentContext.parent.id && parentContext.parent.id.name;
+        const realPotentialClass = realClassName && potentialClasses[realClassName];
+        const potentialClass = realPotentialClass || directPotentialClass;
+        const isStatic = potentialClass === directPotentialClass;
+        if (potentialClass && isStatic) {
+          potentialClass.addField(new PotentialField({
+            name: m.fieldIdentifier.name,
+            valueNode: m.fieldNode,
+            fullNode: node,
+            parent,
+            static: isStatic,
+          }));
+        }
+      }
       else if ((m = matchPrototypeFunctionAssignment(node))) {
         if (potentialClasses[m.className]) {
           potentialClasses[m.className].addMethod(new PotentialMethod({
